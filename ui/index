@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+        <head>
+                <title>SqazLocation</title>
+                
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+                <meta charset="UTF-8" />
+                
+                <style type="text/css">
+                        html, body, #map_canvas {
+                                margin: 0;
+                                padding: 0;
+                                height: 100%;
+                        }
+                </style>
+                
+                <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
+
+        </head>
+        <body>
+                <div id="map_canvas"></div>
+                <script src="Application"></script>
+        </body>
+</html>
