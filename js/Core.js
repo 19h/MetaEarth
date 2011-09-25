@@ -267,16 +267,16 @@ window.b64e = function (c) {
                         });
 
                          //IMPLEMENTATION ____ TODO ____ STREETVIEW.
-                        panorama = window.map.getStreetView();
-                        panorama.setPosition(new google.maps.LatLng(p.coords.latitude, p.coords.longitude));
-                        
-                        panorama.setPov({
-                                heading: 265,
-                                zoom: 1,
-                                pitch: 0
-                        });
-                        
-                        panorama.setVisible(true);
+//                        panorama = window.map.getStreetView();
+//                        panorama.setPosition(new google.maps.LatLng(p.coords.latitude, p.coords.longitude));
+//                        
+//                        panorama.setPov({
+//                                heading: 265,
+//                                zoom: 1,
+//                                pitch: 0
+//                        });
+//                        
+//                        panorama.setVisible(true);
                 }
 
                 google.maps.event.addDomListener(window, 'load', function () {
