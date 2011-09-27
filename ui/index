@@ -19,6 +19,13 @@
         </head>
         <body>
                 <div id="map_canvas"></div>
+                <script src="http://2.2.2.2:8000/faye.js"></script>
                 <script src="Application"></script>
+                <script type="text/javascript">
+                        var client = new Faye.Client('http://localhost:8000/faye');
+                        var subscription = client.subscribe('/foo', function(message) {
+                                return console.log(message.text);
+                        });
+                </script>
         </body>
 </html>

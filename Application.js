@@ -1,11 +1,15 @@
 var m = function () {
                 return new Date().getTime() / 1000;
         }
-var http = require('http'),
-        fs = require('fs'),
-        url = require('url'),
-        path = require('path'),
-        mime = require('mime');
+        
+var $ = function (v) {return require(v);}
+var http = $('http'),
+        fs = $('fs'),
+        url = $('url'),
+        path = $('path'),
+        mime = $('mime'),
+        sio = $('socket.io'),
+        faye = $('faye');
 
 //mimes
 var html = "text/html",
@@ -15,13 +19,10 @@ var html = "text/html",
 
 // FUNCTIONAL
 global.each = function (v, c) {
-        if (typeof v === "array")
-                for (var k = 0; k < v.length; ++k)
-                        c(k, v[k]);
-        else if (typeof v === "object")
-                for (var k in v)
-                        if (this.hasOwnProperty(k))
-                                c(k, v[k]);
+        if (typeof v === "array") for (var k = 0; k < v.length; ++k)
+        c(k, v[k]);
+        else if (typeof v === "object") for (var k in v)
+        if (this.hasOwnProperty(k)) c(k, v[k]);
 }
 
 global.b64d = function (z) { //b64d+utf8
@@ -73,7 +74,7 @@ var Config = {
         },
         gZ: function (v, u) {
                 this.i = false;
-                return gV(v, u);
+                return this.gV(v, u);
         },
         gVc: function (v, u) {
                 this.i = !this.i;
@@ -96,18 +97,33 @@ var Config = {
         }
 }
 
+global.w = 0;
+
 http.createServer(function (request, response) {
 
         //console.log(Config.gZ("ll",u));
         //console.log(Config.gV( false, u = request.url ));
         var x;
-        if ( ( x = Config.gV("ds", u = request.url) ) !== "undefined" )
-                if ( x+"" !== "" )
-                        console.log(x[0][0]+": "+b64d(x[0][1]));
+        if ((x = Config.gV("ds", u = request.url)) !== "undefined") if (x + "" !== "") if (x[0][1] + "" !== "") if (x[0][0] + "" === "ll" && (x[0][0] = "llLocation")) {
+                w += 1;
+                console.log((w == 0 ? w : w < 10 ? "000000" + w : w < 100 ? "00000" + w : w < 1E3 ? "0000" + w : w < 1E4 ? "000" + w : w < 1E5 ? "00" + w : w < 1E6 ? "0" + w : w) + ": " + (x[0][0] + "").substr(2, (x[0][0] + "").length) + ": " + ((x + "").substr(0, 2) == "ll" ? b64d(x[0][1]) : x[0][1]));
+                response.writeHead(200, {
+                        "Content-Type": "text/plain"
+                });
+                response.write("");
+                response.end();
+                return true;
+        }
 
         var uri = url.parse(request.url).pathname,
                 filename = path.join(process.cwd(), uri);
 
+        //switch ( u.substr(0, u.indexOf("?")) ) {
+        //        case "/prime":
+        //                response.writeHead(404, { "Content-Type": "text/plain" });
+        //                //if ( w == i ) { response.write(b+""); response.end(); return; }  
+        //                break;
+        //}
         path.exists(filename, function (exists) {
                 isMime = (exists) ? mime.lookup(filename) : false;
                 exists = true;
@@ -115,19 +131,19 @@ http.createServer(function (request, response) {
                         filename = path.join(process.cwd(), "ui/index");
                         isMime = html;
                 } else if (filename === process.cwd() + "/" + "Application") filename = path.join(process.cwd(), "js/Core.js");
+                else if (filename === process.cwd() + "/" + "Faye") filename = path.join(process.cwd(), "js/faye.js");
                 else exists = false;
 
                 if (!exists) {
                         response.writeHead(404, {
                                 "Content-Type": "text/plain"
                         });
-                        response.write("404 Not Found\n");
+                        response.write("404 Not Found\n" + filename + ":" + process.cwd() /*+"/"*/ );
                         response.end();
                         return;
                 }
 
-                if (fs.statSync(filename).isDirectory()) filename += '/index.html';
-
+                //if (fs.statSync(filename).isDirectory()) filename += '/index.html';
                 fs.readFile(filename, "binary", function (err, file) {
                         if (err) {
                                 response.writeHead(500, {
@@ -146,3 +162,11 @@ http.createServer(function (request, response) {
                 });
         });
 }).listen(8888);
+
+// new asynch listener.
+
+var client = new faye.Client('http://localhost:8000/faye');
+
+var subscription = client.subscribe('/foo', function(message) {
+        return console.log("New post:" + message.text + " ---- " + b64d(message.loc));
+});
