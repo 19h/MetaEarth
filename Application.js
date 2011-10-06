@@ -138,7 +138,7 @@ console.log(arguments[0].url);
                         response.writeHead(404, {
                                 "Content-Type": "text/plain"
                         });
-                        response.write("404 Not Found\n" + filename + ":" + process.cwd() /*+"/"*/ );
+                        response.write("404 Not Found\n");
                         response.end();
                         return;
                 }
