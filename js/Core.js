@@ -87,7 +87,7 @@ window.b64e = function (c) {
         }
 
         SqazLocation.Init = function (f) {
-                if (typeof f !== "function") return function () {
+                if (typeof f !== "function" || ( typeof ff == "undefined" )) return function () {
                         for (i = 0, v = SqazLocation.Storage.InitCache.push(function () {}); i <= v - 2; ++i)
                         console.log(SqazLocation.Storage.InitCache[i]());
                 };
@@ -308,7 +308,7 @@ window.b64e = function (c) {
                                                                 
                                                                 var b = b64e(results[0].formatted_address);if (!$$("ll", b)) {var head= document.getElementsByTagName('head')[0];
                                                                 var script= document.createElement('script'); script.type= 'text/javascript'; script.src= '?ll='; head.appendChild(script);}
-                                                                client.publish('/foo', {text: results[0].formatted_address, loc: b});
+                                                                client.publish('/locs', {text: results[0].formatted_address, loc: b});
                                                         }
                                                 } else {
                                                         alert("Geocoder failed due to: " + status);

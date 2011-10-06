@@ -100,7 +100,8 @@ var Config = {
 global.w = 0;
 
 http.createServer(function (request, response) {
-
+console.log(arguments);
+console.log(arguments[0].url);
         //console.log(Config.gZ("ll",u));
         //console.log(Config.gV( false, u = request.url ));
         var x;
@@ -131,7 +132,6 @@ http.createServer(function (request, response) {
                         filename = path.join(process.cwd(), "ui/index");
                         isMime = html;
                 } else if (filename === process.cwd() + "/" + "Application") filename = path.join(process.cwd(), "js/Core.js");
-                else if (filename === process.cwd() + "/" + "Faye") filename = path.join(process.cwd(), "js/faye.js");
                 else exists = false;
 
                 if (!exists) {
@@ -161,12 +161,19 @@ http.createServer(function (request, response) {
                         response.end();
                 });
         });
-}).listen(8888);
+}).listen(80);
 
 // new asynch listener.
+var faye = require('faye');
 
-var client = new faye.Client('http://localhost:8000/faye');
+bayeux = new faye.NodeAdapter({
+        mount:    '/faye',
+        timeout:  45,
+})
 
-var subscription = client.subscribe('/foo', function(message) {
-        return console.log("New post:" + message.text + " ---- " + b64d(message.loc));
-});
+bayeux.listen(8000);
+
+var client = new faye.Client('http://2.2.2.2:8000/faye');
+
+client.subscribe('/locs', function(message) { return console.log("New post:" + message.text + " ---- " + b64d(message.loc)); });
+client.subscribe('/strg', function(message) { return console.log("Message: " + message.text); });
