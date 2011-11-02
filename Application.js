@@ -60,15 +60,11 @@ var Config = {
                         data = [];
                 for (var i = 0; i < vars.length; ++i) {
                         var pair = vars[i].split("=");
-                        if (pair[0] == v) {
-                                if (this.i === false) {
-                                        return pair[1];
-                                } else {
-                                        return !(this.i = !this.i);
-                                }
-                        } else {
+                        if (pair[0] == v)
+                                if (this.i === false)
+                                        return (this.i === false) ? pair[1] : !(this.i = !this.i);
+                        else
                                 data.push(pair);
-                        }
                 }
                 return (data === []) ? false : data;
         },
